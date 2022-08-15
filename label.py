@@ -52,6 +52,48 @@ def fileCount(folder):
 
     return num_files
 
+def show_feedback(image, key):
+    height = image.shape[0]
+    width = image.shape[1]
+    if key_bindings[key] == 'class -1':
+        # Red color in BGR
+        color = (0, 0, 255)
+        text = 'mislabel'
+    elif key_bindings[key] == 'class 0':
+        # Blue color in BGR
+        color = (255, 0, 0)
+        text = 'fail'
+    elif key_bindings[key] == 'class 1':
+        # Green color in BGR
+        color = (0, 255, 0)
+        text = 'pass'
+    elif key_bindings[key] == 'pending':
+        # Green color in BGR
+        color = (100, 100, 100)
+        text = 'pending'
+    elif key_bindings[key] == 'exit':
+        # Green color in BGR
+        color = (0, 0, 0)
+        text = 'see ya'
+    else:
+        color = (0,0,0)
+        text = 'no command'
+
+    # font
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    # origin
+    org_x = round(width / 2)
+    org_y = round(height / 2)
+    org = (org_x, org_y)
+    # Line thickness of 2 px
+    thickness = 2
+    # fontScale
+    fontScale = 1
+    image = cv2.putText(image, text, org, font, 
+                   fontScale, color, thickness, cv2.LINE_AA)
+    cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', image)
+    cv2.waitKey(250)
+
 def main():
 
     try:
@@ -101,6 +143,9 @@ def main():
             key = str(cv2.waitKey(0))
 
             if key in key_bindings.keys():
+
+                show_feedback(resized, key)
+
                 # exit by pressing the escape key
                 if key_bindings[key] == 'exit':
                     print('terminating program')
