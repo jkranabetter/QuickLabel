@@ -96,7 +96,7 @@ def main():
             resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
 
             # create window and show image
-            cv2.namedWindow('Model 2 Labelling', cv2.WINDOW_AUTOSIZE)
+            cv2.namedWindow('(mislabelled) = a  (fail) = w  (pass) = d', cv2.WINDOW_AUTOSIZE)
             cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', resized)
             key = str(cv2.waitKey(0))
 
