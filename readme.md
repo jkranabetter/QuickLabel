@@ -1,7 +1,14 @@
 
+## Installation
+
 ```
 pip install opencv-python
 ```
+
+## Todo
+- indicate descision before moving on
+- back/undo function
+- display options
 
 ### Files
 
