@@ -42,14 +42,15 @@ def results():
     Calculate the results of classification and display them
     for the user on the console
     """
-    # get the pictures in the 3 folders
+    # get the pictures in the 3 folders and the unlabelled
     os.chdir("./labelled/-1")
     files_minus_1 = glob.glob("*")
     os.chdir("../0")
     files_0 = glob.glob("*")
     os.chdir("../1")
     files_1 = glob.glob("*")
-    os.chdir("../../")
+    os.chdir("../../unlabelled")
+    unlabelled_files = glob.glob("*")
 
     # calculate results
     total = len(files_minus_1) + len(files_0) + len(files_1)
@@ -63,6 +64,7 @@ def results():
     print(str(len(files_minus_1)) + " images classified as -1: " + str(error_per) + "%")
     print(str(len(files_0)) + " images classified as 0: " + str(undecided_per) + "%")
     print(str(len(files_1)) + " images classified as 1: " + str(good_per) + "%")
+    print(str(len(unlabelled_files)) + " unclassified images remaining.")
 
 def fileCount(folder):
     "count the number of files in a directory"
