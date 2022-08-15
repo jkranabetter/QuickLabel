@@ -1,5 +1,6 @@
 import os
 import cv2
+import glob
 
 '''
 Script for model 2 "clarity model" wheat head labelling. 
@@ -17,12 +18,15 @@ Key Codes:
 a = 97 A = 65
 w = 119 W = 87
 d = 100 D = 68
+p = 112 P = 80
 '''
 
 UNLABELLED_FOLDER = 'unlabelled'
 LABELLED_FOLDER = 'labelled'
 
 key_bindings = {
+    '112': 'print results',
+    '80': 'print results',
     '97' : 'class -1',
     '65' : 'class -1',
     '119' : 'class 0',
@@ -32,6 +36,34 @@ key_bindings = {
     '32' : 'pending',
     '27' : 'exit'
 }
+
+def results():
+    """
+    Calculate the results of classification and display them
+    for the user on the console
+    """
+    print(os.getcwd())
+    # get the pictures in the 3 folders
+    os.chdir("./labelled/-1")
+    files_minus_1 = glob.glob("*")
+    os.chdir("../0")
+    files_0 = glob.glob("*")
+    os.chdir("../1")
+    files_1 = glob.glob("*")
+    os.chdir("../../")
+
+    # calculate results
+    total = len(files_minus_1) + len(files_0) + len(files_1)
+    error_per = round(len(files_minus_1) / total * 100, 2)
+    undecided_per = round(len(files_0) / total * 100, 2)
+    good_per = round(len(files_1) / total * 100, 2)
+
+    # print results
+    print("\nResults:")
+    print(str(total) + " total images classified.")
+    print(str(len(files_minus_1)) + " images classified as -1: " + str(error_per) + "%")
+    print(str(len(files_0)) + " images classified as 0: " + str(undecided_per) + "%")
+    print(str(len(files_1)) + " images classified as 1: " + str(good_per) + "%")
 
 def fileCount(folder):
     "count the number of files in a directory"
@@ -64,7 +96,7 @@ for item in os.listdir(UNLABELLED_FOLDER):
 
     # check if the file is an image
     image_path = os.path.join(UNLABELLED_FOLDER, item)
-    
+
     if (image_path.endswith(".png") or image_path.endswith(".jpg")):
         print(f'annotating image: {item}')
 
@@ -97,8 +129,12 @@ for item in os.listdir(UNLABELLED_FOLDER):
             if key_bindings[key] == 'exit':
                 print('terminating program')
                 cv2.destroyAllWindows()
+                results()
                 break
-            
+
+            if key_bindings[key] == 'print results':
+                results()
+
             # assign a class with a w d keys
             if key_bindings[key] == 'class -1':
                 print('\tmoving to mislabelled folder')
