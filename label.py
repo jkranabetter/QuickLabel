@@ -25,6 +25,8 @@ LABELLED_FOLDER = 'labelled'
 MAX_WINDOW_HEIGHT = 600
 MAX_WINDOW_WIDTH = 600
 
+folders = ['-1', '0', '1', 'pending']
+
 key_bindings = {
     '97' : 'class -1',
     '65' : 'class -1',
@@ -50,72 +52,79 @@ def fileCount(folder):
 
     return num_files
 
-# create class folders if they dont alread exist
-folders = ['-1', '0', '1', 'pending']
-for folder in folders:
-    folder_path = os.path.join(LABELLED_FOLDER, folder)
-    if not os.path.isdir(folder_path):
-        os.makedirs(folder_path)
-        print(f'created folder {folder_path}')
+def main():
 
-# get the path/directory
-for item in os.listdir(UNLABELLED_FOLDER):
+    try:
+        # create class folders if they dont alread exist
+        for folder in folders:
+            folder_path = os.path.join(LABELLED_FOLDER, folder)
+            if not os.path.isdir(folder_path):
+                os.makedirs(folder_path)
+                print(f'created folder {folder_path}')
+    except:
+        print('error: "unlabelled" folder not found')
 
-    number_unlabelled = fileCount(UNLABELLED_FOLDER)
-    number_labelled = fileCount(LABELLED_FOLDER)
-    print(f'there are {number_labelled} labelled files and {number_unlabelled} unlabelled files')
+    # get the path/directory
+    for item in os.listdir(UNLABELLED_FOLDER):
 
-    # check if the file is an image
-    image_path = os.path.join(UNLABELLED_FOLDER, item)
-    
-    if (image_path.endswith(".png") or image_path.endswith(".jpg")):
-        print(f'annotating image: {item}')
+        number_unlabelled = fileCount(UNLABELLED_FOLDER)
+        number_labelled = fileCount(LABELLED_FOLDER)
+        print(f'there are {number_labelled} labelled files and {number_unlabelled} unlabelled files')
 
-        # read image
-        img = cv2.imread(image_path, cv2.IMREAD_ANYCOLOR)
-        # check the image shape
-        h, w, c = img.shape
-        # resize image
-        max_dim = max(h, w)
-        if max_dim == h:
-            change_ratio = MAX_WINDOW_HEIGHT / h
-            width = int(img.shape[1] * change_ratio)
-            height = int(MAX_WINDOW_HEIGHT)
-        else:
-            change_ratio = MAX_WINDOW_WIDTH / w
-            width = int(MAX_WINDOW_WIDTH)
-            height = int(img.shape[0] * change_ratio)
+        # check if the file is an image
+        image_path = os.path.join(UNLABELLED_FOLDER, item)
+        
+        if (image_path.endswith(".png") or image_path.endswith(".jpg")):
+            print(f'annotating image: {item}')
 
-        dim = (width, height)
-        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+            # read image
+            img = cv2.imread(image_path, cv2.IMREAD_ANYCOLOR)
+            # check the image shape
+            h, w, c = img.shape
+            # resize image
+            max_dim = max(h, w)
+            if max_dim == h:
+                change_ratio = MAX_WINDOW_HEIGHT / h
+                width = int(img.shape[1] * change_ratio)
+                height = int(MAX_WINDOW_HEIGHT)
+            else:
+                change_ratio = MAX_WINDOW_WIDTH / w
+                width = int(MAX_WINDOW_WIDTH)
+                height = int(img.shape[0] * change_ratio)
 
-        # create window and show image
-        cv2.namedWindow('finalImg', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('finalImg', resized)
-        key = str(cv2.waitKey(0))
+            dim = (width, height)
+            resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
 
-        if key in key_bindings.keys():
-            # exit by pressing the escape key
-            if key_bindings[key] == 'exit':
-                print('terminating program')
-                cv2.destroyAllWindows()
-                break
-            
-            # assign a class with a w d keys
-            if key_bindings[key] == 'class -1':
-                print('\tmoving to mislabelled folder')
-                destination_path_mislabell = os.path.join(LABELLED_FOLDER, folders[0], item)
-                os.rename(image_path, destination_path_mislabell)
-            elif key_bindings[key] == 'class 0':
-                print('\tmoving to fail folder')
-                destination_path_fail = os.path.join(LABELLED_FOLDER, folders[1], item)
-                os.rename(image_path, destination_path_fail)
-            elif key_bindings[key] == 'class 1':
-                print('\tmoving to pass folder')
-                destination_path_pass = os.path.join(LABELLED_FOLDER, folders[2], item)
-                os.rename(image_path, destination_path_pass)
-            elif key_bindings[key] == 'pending':
-                print('\tmoving to pending folder')
-                destination_path_pending = os.path.join(LABELLED_FOLDER, folders[3], item)
-                os.rename(image_path, destination_path_pending)
-            print(f'\tyou have assigned to {key_bindings[key]}')
+            # create window and show image
+            cv2.namedWindow('finalImg', cv2.WINDOW_AUTOSIZE)
+            cv2.imshow('finalImg', resized)
+            key = str(cv2.waitKey(0))
+
+            if key in key_bindings.keys():
+                # exit by pressing the escape key
+                if key_bindings[key] == 'exit':
+                    print('terminating program')
+                    cv2.destroyAllWindows()
+                    break
+                
+                # assign a class with a w d keys
+                if key_bindings[key] == 'class -1':
+                    print('\tmoving to mislabelled folder')
+                    destination_path_mislabell = os.path.join(LABELLED_FOLDER, folders[0], item)
+                    os.rename(image_path, destination_path_mislabell)
+                elif key_bindings[key] == 'class 0':
+                    print('\tmoving to fail folder')
+                    destination_path_fail = os.path.join(LABELLED_FOLDER, folders[1], item)
+                    os.rename(image_path, destination_path_fail)
+                elif key_bindings[key] == 'class 1':
+                    print('\tmoving to pass folder')
+                    destination_path_pass = os.path.join(LABELLED_FOLDER, folders[2], item)
+                    os.rename(image_path, destination_path_pass)
+                elif key_bindings[key] == 'pending':
+                    print('\tmoving to pending folder')
+                    destination_path_pending = os.path.join(LABELLED_FOLDER, folders[3], item)
+                    os.rename(image_path, destination_path_pending)
+                print(f'\tyou have assigned to {key_bindings[key]}')
+
+if __name__ == '__main__':
+    main()
