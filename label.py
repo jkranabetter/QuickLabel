@@ -42,7 +42,6 @@ def results():
     Calculate the results of classification and display them
     for the user on the console
     """
-    print(os.getcwd())
     # get the pictures in the 3 folders
     os.chdir("./labelled/-1")
     files_minus_1 = glob.glob("*")
