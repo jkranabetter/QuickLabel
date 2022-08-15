@@ -19,8 +19,8 @@ w = 119 W = 87
 d = 100 D = 68
 '''
 
-UNLABELLED_FOLDER = 'test_Joshua'
-LABELLED_FOLDER = 'test_sorted'
+UNLABELLED_FOLDER = 'unlabelled'
+LABELLED_FOLDER = 'labelled'
 
 key_bindings = {
     '97' : 'class -1',
@@ -91,7 +91,6 @@ for item in os.listdir(UNLABELLED_FOLDER):
         cv2.namedWindow('finalImg', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('finalImg', resized)
         key = str(cv2.waitKey(0))
-        print(key)
 
         if key in key_bindings.keys():
             # exit by pressing the escape key
