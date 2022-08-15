@@ -22,6 +22,9 @@ d = 100 D = 68
 UNLABELLED_FOLDER = 'unlabelled'
 LABELLED_FOLDER = 'labelled'
 
+MAX_WINDOW_HEIGHT = 600
+MAX_WINDOW_WIDTH = 600
+
 key_bindings = {
     '97' : 'class -1',
     '65' : 'class -1',
@@ -74,16 +77,15 @@ for item in os.listdir(UNLABELLED_FOLDER):
         h, w, c = img.shape
         # resize image
         max_dim = max(h, w)
-        if max_dim < 100:
-            scale_percent = 500
-        elif max_dim < 150:
-            scale_percent = 400
-        elif max_dim < 200:
-            scale_percent = 300
+        if max_dim == h:
+            change_ratio = MAX_WINDOW_HEIGHT / h
+            width = int(img.shape[1] * change_ratio)
+            height = int(MAX_WINDOW_HEIGHT)
         else:
-            scale_percent = 250
-        width = int(img.shape[1] * scale_percent / 100)
-        height = int(img.shape[0] * scale_percent / 100)
+            change_ratio = MAX_WINDOW_WIDTH / w
+            width = int(MAX_WINDOW_WIDTH)
+            height = int(img.shape[0] * change_ratio)
+
         dim = (width, height)
         resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
 
