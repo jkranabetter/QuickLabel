@@ -1,7 +1,7 @@
 
 ## About
 
-This is a quick labelling tool to assign images to different class folders using hotkeys.
+This is a quick labelling tool to assign images to different class folders using hotkeys. About 5 times faster than sorting by hand.
 
 ## Installation
 
