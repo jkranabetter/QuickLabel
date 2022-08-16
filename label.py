@@ -1,5 +1,6 @@
 import os
 import cv2
+import glob
 
 '''
 Script for model 2 "clarity model" wheat head labelling. 
@@ -37,6 +38,35 @@ key_bindings = {
     '32' : 'pending',
     '27' : 'exit'
 }
+
+def results():
+    """
+    Calculate the results of classification and display them
+    for the user on the console
+    """
+    # get the pictures in the 3 folders and the unlabelled
+    os.chdir("./labelled/-1")
+    files_minus_1 = glob.glob("*")
+    os.chdir("../0")
+    files_0 = glob.glob("*")
+    os.chdir("../1")
+    files_1 = glob.glob("*")
+    os.chdir("../../unlabelled")
+    unlabelled_files = glob.glob("*")
+
+    # calculate results
+    total = len(files_minus_1) + len(files_0) + len(files_1)
+    error_per = round(len(files_minus_1) / total * 100, 2)
+    undecided_per = round(len(files_0) / total * 100, 2)
+    good_per = round(len(files_1) / total * 100, 2)
+
+    # print results
+    print("\nResults:")
+    print(str(total) + " total images classified.")
+    print(str(len(files_minus_1)) + " images classified as -1: " + str(error_per) + "%")
+    print(str(len(files_0)) + " images classified as 0: " + str(undecided_per) + "%")
+    print(str(len(files_1)) + " images classified as 1: " + str(good_per) + "%")
+    print(str(len(unlabelled_files)) + " unclassified images remaining.")
 
 def fileCount(folder):
     "count the number of files in a directory"
@@ -162,6 +192,7 @@ def main():
                 if key_bindings[key] == 'exit':
                     print('terminating program')
                     cv2.destroyAllWindows()
+                    results()
                     break
                 
                 # assign a class with a w d keys
