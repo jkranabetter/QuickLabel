@@ -1,6 +1,7 @@
 import os
 import cv2
-import glob
+from constants import *
+from utils import *
 
 '''
 Script for model 2 "clarity model" wheat head labelling. 
@@ -20,14 +21,6 @@ w = 119 W = 87
 d = 100 D = 68
 '''
 
-UNLABELLED_FOLDER = 'unlabelled'
-LABELLED_FOLDER = 'labelled'
-
-MAX_WINDOW_HEIGHT = 600
-MAX_WINDOW_WIDTH = 600
-
-folders = ['-1', '0', '1', 'pending']
-
 key_bindings = {
     '97' : 'class -1',
     '65' : 'class -1',
@@ -38,49 +31,6 @@ key_bindings = {
     '32' : 'pending',
     '27' : 'exit'
 }
-
-def results():
-    """
-    Calculate the results of classification and display them
-    for the user on the console
-    """
-    # get the pictures in the 3 folders and the unlabelled
-    os.chdir("./labelled/-1")
-    files_minus_1 = glob.glob("*")
-    os.chdir("../0")
-    files_0 = glob.glob("*")
-    os.chdir("../1")
-    files_1 = glob.glob("*")
-    os.chdir("../../unlabelled")
-    unlabelled_files = glob.glob("*")
-
-    # calculate results
-    total = len(files_minus_1) + len(files_0) + len(files_1)
-    error_per = round(len(files_minus_1) / total * 100, 2)
-    undecided_per = round(len(files_0) / total * 100, 2)
-    good_per = round(len(files_1) / total * 100, 2)
-
-    # print results
-    print("\nResults:")
-    print(str(total) + " total images classified.")
-    print(str(len(files_minus_1)) + " images classified as -1: " + str(error_per) + "%")
-    print(str(len(files_0)) + " images classified as 0: " + str(undecided_per) + "%")
-    print(str(len(files_1)) + " images classified as 1: " + str(good_per) + "%")
-    print(str(len(unlabelled_files)) + " unclassified images remaining.")
-
-def fileCount(folder):
-    "count the number of files in a directory"
-
-    num_files = 0
-    num_dir = 0
-
-    for base, dirs, files in os.walk(folder):
-        for dir in dirs:
-            num_dir += 1
-        for file in files:
-            num_files += 1
-
-    return num_files
 
 def show_feedback(image, key):
 
@@ -124,19 +74,6 @@ def show_feedback(image, key):
     # show the selected class on the image for a moment before changing images
     cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', image)
     cv2.waitKey(250)
-
-def verify_directories():
-    # create unlabelled folder if it doesnt already exist
-    if not os.path.isdir(UNLABELLED_FOLDER):
-        print('no unlabelled folder... creating it for you')
-        os.makedirs(UNLABELLED_FOLDER)
-
-    # create class folders if they dont already exist
-    for folder in folders:
-        folder_path = os.path.join(LABELLED_FOLDER, folder)
-        if not os.path.isdir(folder_path):
-            os.makedirs(folder_path)
-            print(f'created folder {folder_path}')
 
 def main():
 
@@ -192,25 +129,25 @@ def main():
                 if key_bindings[key] == 'exit':
                     print('terminating program')
                     cv2.destroyAllWindows()
-                    results()
+                    print_results()
                     break
                 
                 # assign a class with a w d keys
                 if key_bindings[key] == 'class -1':
                     print('\tmoving to mislabelled folder')
-                    destination_path_mislabell = os.path.join(LABELLED_FOLDER, folders[0], item)
+                    destination_path_mislabell = os.path.join(LABELLED_FOLDER, FOLDERS[0], item)
                     os.rename(image_path, destination_path_mislabell)
                 elif key_bindings[key] == 'class 0':
                     print('\tmoving to fail folder')
-                    destination_path_fail = os.path.join(LABELLED_FOLDER, folders[1], item)
+                    destination_path_fail = os.path.join(LABELLED_FOLDER, FOLDERS[1], item)
                     os.rename(image_path, destination_path_fail)
                 elif key_bindings[key] == 'class 1':
                     print('\tmoving to pass folder')
-                    destination_path_pass = os.path.join(LABELLED_FOLDER, folders[2], item)
+                    destination_path_pass = os.path.join(LABELLED_FOLDER, FOLDERS[2], item)
                     os.rename(image_path, destination_path_pass)
                 elif key_bindings[key] == 'pending':
                     print('\tmoving to pending folder')
-                    destination_path_pending = os.path.join(LABELLED_FOLDER, folders[3], item)
+                    destination_path_pending = os.path.join(LABELLED_FOLDER, FOLDERS[3], item)
                     os.rename(image_path, destination_path_pending)
                 print(f'\tyou have assigned to {key_bindings[key]}')
 
