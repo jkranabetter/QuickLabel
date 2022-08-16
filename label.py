@@ -116,40 +116,44 @@ def main():
             dim = (width, height)
             resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
 
-            # create window and show image
-            cv2.namedWindow('(mislabelled) = a  (fail) = w  (pass) = d', cv2.WINDOW_AUTOSIZE)
-            cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', resized)
-            key = str(cv2.waitKey(0))
+            key_pressed = False
+            while(not key_pressed):
 
-            if key in key_bindings.keys():
+                # create window and show image
+                cv2.namedWindow('(mislabelled) = a  (fail) = w  (pass) = d', cv2.WINDOW_AUTOSIZE)
+                cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', resized)
+                key = str(cv2.waitKey(0))
 
-                show_feedback(resized, key)
+                if key in key_bindings.keys():
+                    key_pressed = True
 
-                # exit by pressing the escape key
-                if key_bindings[key] == 'exit':
-                    print('terminating program')
-                    cv2.destroyAllWindows()
-                    print_results()
-                    break
-                
-                # assign a class with a w d keys
-                if key_bindings[key] == 'class -1':
-                    print('\tmoving to mislabelled folder')
-                    destination_path_mislabell = os.path.join(LABELLED_FOLDER, FOLDERS[0], item)
-                    os.rename(image_path, destination_path_mislabell)
-                elif key_bindings[key] == 'class 0':
-                    print('\tmoving to fail folder')
-                    destination_path_fail = os.path.join(LABELLED_FOLDER, FOLDERS[1], item)
-                    os.rename(image_path, destination_path_fail)
-                elif key_bindings[key] == 'class 1':
-                    print('\tmoving to pass folder')
-                    destination_path_pass = os.path.join(LABELLED_FOLDER, FOLDERS[2], item)
-                    os.rename(image_path, destination_path_pass)
-                elif key_bindings[key] == 'pending':
-                    print('\tmoving to pending folder')
-                    destination_path_pending = os.path.join(LABELLED_FOLDER, FOLDERS[3], item)
-                    os.rename(image_path, destination_path_pending)
-                print(f'\tyou have assigned to {key_bindings[key]}')
+            show_feedback(resized, key)
+
+            # exit by pressing the escape key
+            if key_bindings[key] == 'exit':
+                print('terminating program')
+                cv2.destroyAllWindows()
+                print_results()
+                break
+            
+            # assign a class with a w d keys
+            if key_bindings[key] == 'class -1':
+                print('\tmoving to mislabelled folder')
+                destination_path_mislabell = os.path.join(LABELLED_FOLDER, FOLDERS[0], item)
+                os.rename(image_path, destination_path_mislabell)
+            elif key_bindings[key] == 'class 0':
+                print('\tmoving to fail folder')
+                destination_path_fail = os.path.join(LABELLED_FOLDER, FOLDERS[1], item)
+                os.rename(image_path, destination_path_fail)
+            elif key_bindings[key] == 'class 1':
+                print('\tmoving to pass folder')
+                destination_path_pass = os.path.join(LABELLED_FOLDER, FOLDERS[2], item)
+                os.rename(image_path, destination_path_pass)
+            elif key_bindings[key] == 'pending':
+                print('\tmoving to pending folder')
+                destination_path_pending = os.path.join(LABELLED_FOLDER, FOLDERS[3], item)
+                os.rename(image_path, destination_path_pending)
+            print(f'\tyou have assigned to {key_bindings[key]}')
 
 if __name__ == '__main__':
     main()
