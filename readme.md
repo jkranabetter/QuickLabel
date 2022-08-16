@@ -1,9 +1,15 @@
 
+## About
+
+This is a quick labelling tool to assign images to different class folders using hotkeys.
+
 ## Installation
 
 ```
 pip install opencv-python
 ```
+
+Put your unlabelled images in the **unlabelled** folder. If you dont already have labelled files, the program will create the labelled directory for you. If you have previously labelled files, put them in the **labelled** folder according to the directory stucture below.
 
 ## Directory Structure
 ```
