@@ -53,8 +53,7 @@ def fileCount(folder):
     return num_files
 
 def show_feedback(image, key):
-    height = image.shape[0]
-    width = image.shape[1]
+
     if key_bindings[key] == 'class -1':
         # Red color in BGR
         color = (0, 0, 200)
@@ -71,31 +70,30 @@ def show_feedback(image, key):
         color = (100, 100, 100)
         text = 'pending'
     elif key_bindings[key] == 'exit':
-        # Green color in BGR
-        color = (0, 0, 0)
+        # white
+        color = (255, 255, 255)
         text = 'see ya'
     else:
         color = (0,0,0)
         text = 'no command'
 
-    # font
     font = cv2.FONT_HERSHEY_DUPLEX
-    
-    # Line thickness of 2 px
     thickness = 2
-    # fontScale
     fontScale = 1
 
+    # get the text size and calculate position for text
     (text_w, text_h), baseline = cv2.getTextSize(text, font, fontScale, thickness)
-    # origin
-    org_x = round(width / 2)
-    org_y = round(height / 2)
-    org = (50, 50 + text_h + int(baseline/2))
-    cv2.rectangle(image, (50,50), (50 + text_w, 50 + text_h + baseline), (0,0,0), -1)
-    image = cv2.putText(image, text, org, font, 
-                   fontScale, color, thickness, cv2.LINE_AA)
+    org_x = round(image.shape[1] / 2)
+    org_y = round(image.shape[0] / 2)
+    text_org = (org_x - round(text_w / 2), org_y + round(text_h/2) + round(baseline/2))
+
+    # draw a black box behind text for better contrast
+    cv2.rectangle(image, (org_x - round(text_w / 2), org_y - round(text_h / 2)), (org_x + round(text_w / 2), org_y + round(text_h / 2) + baseline), (0,0,0), -1)
+    image = cv2.putText(image, text, text_org, font, fontScale, color, thickness, cv2.LINE_AA)
+
+    # show the selected class on the image for a moment before changing images
     cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', image)
-    cv2.waitKey(1000)
+    cv2.waitKey(250)
 
 def verify_directories():
     # create unlabelled folder if it doesnt already exist
