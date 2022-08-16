@@ -82,6 +82,49 @@ def fileCount(folder):
 
     return num_files
 
+def show_feedback(image, key):
+
+    if key_bindings[key] == 'class -1':
+        # Red color in BGR
+        color = (0, 0, 200)
+        text = 'mislabel'
+    elif key_bindings[key] == 'class 0':
+        # Blue color in BGR
+        color = (255, 100, 0)
+        text = 'fail'
+    elif key_bindings[key] == 'class 1':
+        # Green color in BGR
+        color = (0, 150, 0)
+        text = 'pass'
+    elif key_bindings[key] == 'pending':
+        color = (100, 100, 100)
+        text = 'pending'
+    elif key_bindings[key] == 'exit':
+        # white
+        color = (255, 255, 255)
+        text = 'see ya'
+    else:
+        color = (0,0,0)
+        text = 'no command'
+
+    font = cv2.FONT_HERSHEY_DUPLEX
+    thickness = 2
+    fontScale = 1
+
+    # get the text size and calculate position for text
+    (text_w, text_h), baseline = cv2.getTextSize(text, font, fontScale, thickness)
+    org_x = round(image.shape[1] / 2)
+    org_y = round(image.shape[0] / 2)
+    text_org = (org_x - round(text_w / 2), org_y + round(text_h/2) + round(baseline/2))
+
+    # draw a black box behind text for better contrast
+    cv2.rectangle(image, (org_x - round(text_w / 2), org_y - round(text_h / 2)), (org_x + round(text_w / 2), org_y + round(text_h / 2) + baseline), (0,0,0), -1)
+    image = cv2.putText(image, text, text_org, font, fontScale, color, thickness, cv2.LINE_AA)
+
+    # show the selected class on the image for a moment before changing images
+    cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', image)
+    cv2.waitKey(250)
+
 def verify_directories():
     # create unlabelled folder if it doesnt already exist
     if not os.path.isdir(UNLABELLED_FOLDER):
@@ -142,6 +185,9 @@ def main():
             key = str(cv2.waitKey(0))
 
             if key in key_bindings.keys():
+
+                show_feedback(resized, key)
+
                 # exit by pressing the escape key
                 if key_bindings[key] == 'exit':
                     print('terminating program')
