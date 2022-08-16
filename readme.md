@@ -5,6 +5,16 @@
 pip install opencv-python
 ```
 
+## Directory Structure
+```
+├── labelled/
+│   ├── -1
+│   ├── 0
+│   ├── 1
+│   └── pending
+└── unlabelled
+```
+
 ## Todo
 - back/undo function
 - display options (resizing)
