@@ -57,18 +57,17 @@ def show_feedback(image, key):
     width = image.shape[1]
     if key_bindings[key] == 'class -1':
         # Red color in BGR
-        color = (0, 0, 255)
+        color = (0, 0, 200)
         text = 'mislabel'
     elif key_bindings[key] == 'class 0':
         # Blue color in BGR
-        color = (255, 0, 0)
+        color = (255, 100, 0)
         text = 'fail'
     elif key_bindings[key] == 'class 1':
         # Green color in BGR
-        color = (0, 255, 0)
+        color = (0, 150, 0)
         text = 'pass'
     elif key_bindings[key] == 'pending':
-        # Green color in BGR
         color = (100, 100, 100)
         text = 'pending'
     elif key_bindings[key] == 'exit':
@@ -80,19 +79,23 @@ def show_feedback(image, key):
         text = 'no command'
 
     # font
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    # origin
-    org_x = round(width / 2)
-    org_y = round(height / 2)
-    org = (org_x, org_y)
+    font = cv2.FONT_HERSHEY_DUPLEX
+    
     # Line thickness of 2 px
     thickness = 2
     # fontScale
     fontScale = 1
+
+    (text_w, text_h), baseline = cv2.getTextSize(text, font, fontScale, thickness)
+    # origin
+    org_x = round(width / 2)
+    org_y = round(height / 2)
+    org = (50, 50 + text_h + int(baseline/2))
+    cv2.rectangle(image, (50,50), (50 + text_w, 50 + text_h + baseline), (0,0,0), -1)
     image = cv2.putText(image, text, org, font, 
                    fontScale, color, thickness, cv2.LINE_AA)
     cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', image)
-    cv2.waitKey(250)
+    cv2.waitKey(1000)
 
 def verify_directories():
     # create unlabelled folder if it doesnt already exist
