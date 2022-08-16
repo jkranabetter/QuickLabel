@@ -94,17 +94,28 @@ def show_feedback(image, key):
     cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', image)
     cv2.waitKey(250)
 
+def verify_directories():
+    # create unlabelled folder if it doesnt already exist
+    if not os.path.isdir(UNLABELLED_FOLDER):
+        print('no unlabelled folder... creating it for you')
+        os.makedirs(UNLABELLED_FOLDER)
+
+    # create class folders if they dont already exist
+    for folder in folders:
+        folder_path = os.path.join(LABELLED_FOLDER, folder)
+        if not os.path.isdir(folder_path):
+            os.makedirs(folder_path)
+            print(f'created folder {folder_path}')
+
 def main():
 
-    try:
-        # create class folders if they dont alread exist
-        for folder in folders:
-            folder_path = os.path.join(LABELLED_FOLDER, folder)
-            if not os.path.isdir(folder_path):
-                os.makedirs(folder_path)
-                print(f'created folder {folder_path}')
-    except:
-        print('error: "unlabelled" folder not found')
+    # make sure the proper directories exist
+    verify_directories()
+
+    # make sure unlabelled folder is not empty
+    if fileCount(UNLABELLED_FOLDER) == 0:
+        print('your unlabelled folder is empty!')
+        return
 
     # get the path/directory
     for item in os.listdir(UNLABELLED_FOLDER):
