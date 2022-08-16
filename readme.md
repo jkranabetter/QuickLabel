@@ -6,10 +6,8 @@ pip install opencv-python
 ```
 
 ## Todo
-- improve display sizing
-- indicate descision before moving on
 - back/undo function
-- display options
+- display options (resizing)
 
 ### Files
 
