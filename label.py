@@ -1,8 +1,4 @@
-import os
-import cv2
-from constants import *
 from utils import *
-
 '''
 Script for model 2 "clarity model" wheat head labelling. 
 
@@ -14,66 +10,26 @@ Key assignments:
 a = class -1
 w = class 0
 d = class 1
+u = undo
 
-Key Codes:
-a = 97 A = 65
-w = 119 W = 87
-d = 100 D = 68
 '''
 
-key_bindings = {
-    '97' : 'class -1',
-    '65' : 'class -1',
-    '119' : 'class 0',
-    '87' : 'class 0',
-    '100' : 'class 1',
-    '68' : 'class 1',
-    '32' : 'pending',
-    '27' : 'exit'
-}
 
-def show_feedback(image, key):
+class MaxStack(list):
 
-    if key_bindings[key] == 'class -1':
-        # Red color in BGR
-        color = (0, 0, 200)
-        text = 'mislabel'
-    elif key_bindings[key] == 'class 0':
-        # Blue color in BGR
-        color = (255, 100, 0)
-        text = 'fail'
-    elif key_bindings[key] == 'class 1':
-        # Green color in BGR
-        color = (0, 150, 0)
-        text = 'pass'
-    elif key_bindings[key] == 'pending':
-        color = (100, 100, 100)
-        text = 'pending'
-    elif key_bindings[key] == 'exit':
-        # white
-        color = (255, 255, 255)
-        text = 'see ya'
-    else:
-        color = (0,0,0)
-        text = 'no command'
+    def __init__(self, max_size):
+        super().__init__()
+        self.max_size = max_size
 
-    font = cv2.FONT_HERSHEY_DUPLEX
-    thickness = 2
-    fontScale = 1
+    def push(self, element):
+        self.append(element)
 
-    # get the text size and calculate position for text
-    (text_w, text_h), baseline = cv2.getTextSize(text, font, fontScale, thickness)
-    org_x = round(image.shape[1] / 2)
-    org_y = round(image.shape[0] / 2)
-    text_org = (org_x - round(text_w / 2), org_y + round(text_h/2) + round(baseline/2))
+    def append(self, element):
+        super().append(element)
 
-    # draw a black box behind text for better contrast
-    cv2.rectangle(image, (org_x - round(text_w / 2), org_y - round(text_h / 2)), (org_x + round(text_w / 2), org_y + round(text_h / 2) + baseline), (0,0,0), -1)
-    image = cv2.putText(image, text, text_org, font, fontScale, color, thickness, cv2.LINE_AA)
+        if super().__len__() > self.max_size:
+            super().__delitem__(0)
 
-    # show the selected class on the image for a moment before changing images
-    cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', image)
-    cv2.waitKey(250)
 
 def main():
 
@@ -81,79 +37,96 @@ def main():
     verify_directories()
 
     # make sure unlabelled folder is not empty
-    if fileCount(UNLABELLED_FOLDER) == 0:
+    if file_count(UNLABELLED_FOLDER) == 0:
         print('your unlabelled folder is empty!')
         return
 
-    # get the path/directory
+    # create file stack
+    file_stack = []
+
+    # get files in the directory and store in the stack
     for item in os.listdir(UNLABELLED_FOLDER):
 
-        number_unlabelled = fileCount(UNLABELLED_FOLDER)
-        number_labelled = fileCount(LABELLED_FOLDER)
-        print(f'there are {number_labelled} labelled files and {number_unlabelled} unlabelled files')
-
         # check if the file is an image
-        image_path = os.path.join(UNLABELLED_FOLDER, item)
-        
-        if (image_path.endswith(".png") or image_path.endswith(".jpg")):
-            print(f'annotating image: {item}')
+        if item.endswith(".png") or item.endswith(".jpg"):
+            file_stack.append(item)
 
-            # read image
-            img = cv2.imread(image_path, cv2.IMREAD_ANYCOLOR)
-            # check the image shape
-            h, w, c = img.shape
-            # resize image
-            max_dim = max(h, w)
-            if max_dim == h:
-                change_ratio = MAX_WINDOW_HEIGHT / h
-                width = int(img.shape[1] * change_ratio)
-                height = int(MAX_WINDOW_HEIGHT)
-            else:
-                change_ratio = MAX_WINDOW_WIDTH / w
-                width = int(MAX_WINDOW_WIDTH)
-                height = int(img.shape[0] * change_ratio)
+    # sort files alphabetically
+    file_stack.sort()
 
-            dim = (width, height)
-            resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+    # create buffer stack
+    buffer_stack = MaxStack(BUFFER_SIZE)
 
-            key_pressed = False
-            while(not key_pressed):
+    # run through the image files one by one
+    while file_stack:
 
-                # create window and show image
-                cv2.namedWindow('(mislabelled) = a  (fail) = w  (pass) = d', cv2.WINDOW_AUTOSIZE)
-                cv2.imshow('(mislabelled) = a  (fail) = w  (pass) = d', resized)
-                key = str(cv2.waitKey(0))
+        # stack peek
+        current_image = file_stack[-1]
 
-                if key in key_bindings.keys():
-                    key_pressed = True
+        image_path = os.path.join(UNLABELLED_FOLDER, current_image)
 
-            show_feedback(resized, key)
+        print(f'annotating image: {image_path}')
+        number_unlabelled = file_count(UNLABELLED_FOLDER)
+        number_labelled = file_count(LABELLED_FOLDER)
+        print(f'{number_labelled} labelled, {number_unlabelled} unlabelled files')
 
-            # exit by pressing the escape key
-            if key_bindings[key] == 'exit':
-                print('terminating program')
-                cv2.destroyAllWindows()
-                print_results()
-                break
-            
-            # assign a class with a w d keys
-            if key_bindings[key] == 'class -1':
-                print('\tmoving to mislabelled folder')
-                destination_path_mislabell = os.path.join(LABELLED_FOLDER, FOLDERS[0], item)
-                os.rename(image_path, destination_path_mislabell)
-            elif key_bindings[key] == 'class 0':
-                print('\tmoving to fail folder')
-                destination_path_fail = os.path.join(LABELLED_FOLDER, FOLDERS[1], item)
-                os.rename(image_path, destination_path_fail)
-            elif key_bindings[key] == 'class 1':
-                print('\tmoving to pass folder')
-                destination_path_pass = os.path.join(LABELLED_FOLDER, FOLDERS[2], item)
-                os.rename(image_path, destination_path_pass)
-            elif key_bindings[key] == 'pending':
-                print('\tmoving to pending folder')
-                destination_path_pending = os.path.join(LABELLED_FOLDER, FOLDERS[3], item)
-                os.rename(image_path, destination_path_pending)
-            print(f'\tyou have assigned to {key_bindings[key]}')
+        img = cv2.imread(image_path, cv2.IMREAD_ANYCOLOR)
+
+        resized = resize_image(img)
+
+        # display image and read keypress
+        key_pressed = False
+        key = None
+        while not key_pressed:
+
+            cv2.namedWindow(WINDOW_STRING, cv2.WINDOW_AUTOSIZE)
+            cv2.imshow(WINDOW_STRING, resized)
+            key = str(cv2.waitKey(0))
+
+            if key in KEY_BINDINGS.keys():
+                key_pressed = True
+
+        show_feedback(resized, key)
+
+        # exit by pressing the escape key
+        if KEY_BINDINGS[key] == 'exit':
+            print('terminating program')
+            cv2.destroyAllWindows()
+            print_results()
+            break
+
+        # assign a class with a w d keys
+        if KEY_BINDINGS[key] == 'class -1':
+            print('\tmoving to mislabelled folder')
+            item1 = file_stack.pop()
+            print(item1)
+            destination_path_mislabel = os.path.join(LABELLED_FOLDER, FOLDERS[0], current_image)
+            buffer_stack.push(
+                (current_image, image_path, destination_path_mislabel))
+            os.rename(image_path, destination_path_mislabel)
+        elif KEY_BINDINGS[key] == 'class 0':
+            print('\tmoving to fail folder')
+            file_stack.pop()
+            destination_path_fail = os.path.join(LABELLED_FOLDER, FOLDERS[1], current_image)
+            buffer_stack.push(
+                (current_image, image_path, destination_path_fail))
+            os.rename(image_path, destination_path_fail)
+        elif KEY_BINDINGS[key] == 'class 1':
+            print('\tmoving to pass folder')
+            file_stack.pop()
+            destination_path_pass = os.path.join(LABELLED_FOLDER, FOLDERS[2], current_image)
+            buffer_stack.push(
+                (current_image, image_path, destination_path_pass))
+            os.rename(image_path, destination_path_pass)
+        elif KEY_BINDINGS[key] == 'undo':
+            if not buffer_stack:
+                print('the undo buffer is already empty, cant go back further')
+                continue
+            print('\tundo previous action')
+            (buff_file, buff_source, buff_des) = buffer_stack.pop()
+            os.rename(buff_des, buff_source)
+            file_stack.append(buff_file)
+
 
 if __name__ == '__main__':
     main()
