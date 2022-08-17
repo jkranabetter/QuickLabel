@@ -3,32 +3,37 @@ import glob
 from constants import *
 import cv2
 
+
 def verify_directories():
-    # create unlabelled folder if it doesnt already exist
+    # create unlabelled folder if it doesn't already exist
     if not os.path.isdir(UNLABELLED_FOLDER):
         print('no unlabelled folder... creating it for you')
         os.makedirs(UNLABELLED_FOLDER)
 
-    # create class folders if they dont already exist
+    # create class folders if they don't already exist
     for folder in FOLDERS:
         folder_path = os.path.join(LABELLED_FOLDER, folder)
         if not os.path.isdir(folder_path):
             os.makedirs(folder_path)
             print(f'created folder {folder_path}')
 
-def fileCount(folder) -> int:
-    "count the number of files in a directory"
+
+def file_count(folder) -> int:
+    """
+    Count the number of files in a directory
+    """
 
     num_files = 0
     num_dir = 0
 
     for base, dirs, files in os.walk(folder):
-        for dir in dirs:
+        for _ in dirs:
             num_dir += 1
-        for file in files:
+        for _ in files:
             num_files += 1
 
     return num_files
+
 
 def print_results():
     """
@@ -62,6 +67,7 @@ def print_results():
     except ZeroDivisionError:
         print("\nNo classified images in 'labelled' folder.")
 
+
 def show_feedback(image, key):
 
     if KEY_BINDINGS[key] == 'class -1':
@@ -84,26 +90,28 @@ def show_feedback(image, key):
         color = (255, 255, 255)
         text = 'see ya'
     else:
-        color = (0,0,0)
+        color = (0, 0, 0)
         text = 'no command'
 
     font = cv2.FONT_HERSHEY_DUPLEX
     thickness = 2
-    fontScale = 1
+    font_scale = 1
 
     # get the text size and calculate position for text
-    (text_w, text_h), baseline = cv2.getTextSize(text, font, fontScale, thickness)
+    (text_w, text_h), baseline = cv2.getTextSize(text, font, font_scale, thickness)
     org_x = round(image.shape[1] / 2)
     org_y = round(image.shape[0] / 2)
     text_org = (org_x - round(text_w / 2), org_y + round(text_h/2) + round(baseline/2))
 
     # draw a black box behind text for better contrast
-    cv2.rectangle(image, (org_x - round(text_w / 2), org_y - round(text_h / 2)), (org_x + round(text_w / 2), org_y + round(text_h / 2) + baseline), (0,0,0), -1)
-    image = cv2.putText(image, text, text_org, font, fontScale, color, thickness, cv2.LINE_AA)
+    cv2.rectangle(image, (org_x - round(text_w / 2), org_y - round(text_h / 2)),
+                  (org_x + round(text_w / 2), org_y + round(text_h / 2) + baseline), (0, 0, 0), -1)
+    image = cv2.putText(image, text, text_org, font, font_scale, color, thickness, cv2.LINE_AA)
 
     # show the selected class on the image for a moment before changing images
     cv2.imshow(WINDOW_STRING, image)
     cv2.waitKey(250)
+
 
 def resize_image(img):
     """

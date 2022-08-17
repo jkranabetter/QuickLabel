@@ -1,6 +1,3 @@
-import os
-import cv2
-from constants import *
 from utils import *
 '''
 Script for model 2 "clarity model" wheat head labelling. 
@@ -40,7 +37,7 @@ def main():
     verify_directories()
 
     # make sure unlabelled folder is not empty
-    if fileCount(UNLABELLED_FOLDER) == 0:
+    if file_count(UNLABELLED_FOLDER) == 0:
         print('your unlabelled folder is empty!')
         return
 
@@ -51,7 +48,7 @@ def main():
     for item in os.listdir(UNLABELLED_FOLDER):
 
         # check if the file is an image
-        if (item.endswith(".png") or item.endswith(".jpg")):
+        if item.endswith(".png") or item.endswith(".jpg"):
             file_stack.append(item)
 
     # sort files alphabetically
@@ -61,7 +58,7 @@ def main():
     buffer_stack = MaxStack(BUFFER_SIZE)
 
     # run through the image files one by one
-    while (file_stack):
+    while file_stack:
 
         # stack peek
         current_image = file_stack[-1]
@@ -69,8 +66,8 @@ def main():
         image_path = os.path.join(UNLABELLED_FOLDER, current_image)
 
         print(f'annotating image: {image_path}')
-        number_unlabelled = fileCount(UNLABELLED_FOLDER)
-        number_labelled = fileCount(LABELLED_FOLDER)
+        number_unlabelled = file_count(UNLABELLED_FOLDER)
+        number_labelled = file_count(LABELLED_FOLDER)
         print(f'{number_labelled} labelled, {number_unlabelled} unlabelled files')
 
         img = cv2.imread(image_path, cv2.IMREAD_ANYCOLOR)
@@ -79,7 +76,8 @@ def main():
 
         # display image and read keypress
         key_pressed = False
-        while (not key_pressed):
+        key = None
+        while not key_pressed:
 
             cv2.namedWindow(WINDOW_STRING, cv2.WINDOW_AUTOSIZE)
             cv2.imshow(WINDOW_STRING, resized)
@@ -102,10 +100,10 @@ def main():
             print('\tmoving to mislabelled folder')
             item1 = file_stack.pop()
             print(item1)
-            destination_path_mislabell = os.path.join(LABELLED_FOLDER, FOLDERS[0], current_image)
+            destination_path_mislabel = os.path.join(LABELLED_FOLDER, FOLDERS[0], current_image)
             buffer_stack.push(
-                (current_image, image_path, destination_path_mislabell))
-            os.rename(image_path, destination_path_mislabell)
+                (current_image, image_path, destination_path_mislabel))
+            os.rename(image_path, destination_path_mislabel)
         elif KEY_BINDINGS[key] == 'class 0':
             print('\tmoving to fail folder')
             file_stack.pop()
@@ -125,8 +123,8 @@ def main():
                 print('the undo buffer is already empty, cant go back further')
                 continue
             print('\tundo previous action')
-            (buff_file, buff_source, buff_dest) = buffer_stack.pop()
-            os.rename(buff_dest, buff_source)
+            (buff_file, buff_source, buff_des) = buffer_stack.pop()
+            os.rename(buff_des, buff_source)
             file_stack.append(buff_file)
 
 
