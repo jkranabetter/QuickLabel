@@ -10,7 +10,7 @@ MAX_WINDOW_HEIGHT = 600
 MAX_WINDOW_WIDTH = 600
 
 # set the size of the undo buffer (how many you can go back)
-BUFFER_SIZE = 3
+BUFFER_SIZE = 10
 
 KEY_BINDINGS = {
     '97': 'class -1',
