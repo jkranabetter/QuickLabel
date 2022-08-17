@@ -39,6 +39,7 @@ def main():
     # make sure unlabelled folder is not empty
     if file_count(UNLABELLED_FOLDER) == 0:
         print('your unlabelled folder is empty!')
+        print_results()
         return
 
     # create file stack
@@ -92,7 +93,6 @@ def main():
         if KEY_BINDINGS[key] == 'exit':
             print('terminating program')
             cv2.destroyAllWindows()
-            print_results()
             break
 
         # assign a class with a w d keys
@@ -126,6 +126,8 @@ def main():
             (buff_file, buff_source, buff_des) = buffer_stack.pop()
             os.rename(buff_des, buff_source)
             file_stack.append(buff_file)
+
+    print_results()
 
 
 if __name__ == '__main__':
