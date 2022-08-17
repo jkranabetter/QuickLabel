@@ -35,29 +35,32 @@ def print_results():
     Calculate the results of classification and display them
     for the user on the console
     """
-    # get the pictures in the 3 folders and the unlabelled
-    os.chdir("./labelled/-1")
-    files_minus_1 = glob.glob("*")
-    os.chdir("../0")
-    files_0 = glob.glob("*")
-    os.chdir("../1")
-    files_1 = glob.glob("*")
-    os.chdir("../../unlabelled")
-    unlabelled_files = glob.glob("*")
+    try:
+        # get the pictures in the 3 folders and the unlabelled
+        os.chdir("./labelled/-1")
+        files_minus_1 = glob.glob("*")
+        os.chdir("../0")
+        files_0 = glob.glob("*")
+        os.chdir("../1")
+        files_1 = glob.glob("*")
+        os.chdir("../../unlabelled")
+        unlabelled_files = glob.glob("*")
 
-    # calculate results
-    total = len(files_minus_1) + len(files_0) + len(files_1)
-    error_per = round(len(files_minus_1) / total * 100, 2)
-    undecided_per = round(len(files_0) / total * 100, 2)
-    good_per = round(len(files_1) / total * 100, 2)
+        # calculate results
+        total = len(files_minus_1) + len(files_0) + len(files_1)
+        error_per = round(len(files_minus_1) / total * 100, 2)
+        undecided_per = round(len(files_0) / total * 100, 2)
+        good_per = round(len(files_1) / total * 100, 2)
 
-    # print results
-    print("\nResults:")
-    print(str(total) + " total images classified.")
-    print(str(len(files_minus_1)) + " images classified as -1: " + str(error_per) + "%")
-    print(str(len(files_0)) + " images classified as 0: " + str(undecided_per) + "%")
-    print(str(len(files_1)) + " images classified as 1: " + str(good_per) + "%")
-    print(str(len(unlabelled_files)) + " unclassified images remaining.")
+        # print results
+        print("\nResults:")
+        print(str(total) + " total images classified.")
+        print(str(len(files_minus_1)) + " images classified as -1: " + str(error_per) + "%")
+        print(str(len(files_0)) + " images classified as 0: " + str(undecided_per) + "%")
+        print(str(len(files_1)) + " images classified as 1: " + str(good_per) + "%")
+        print(str(len(unlabelled_files)) + " unclassified images remaining.")
+    except ZeroDivisionError:
+        print("\nNo classified images in 'labelled' folder.")
 
 def show_feedback(image, key):
 
