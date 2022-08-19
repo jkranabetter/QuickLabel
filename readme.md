@@ -22,7 +22,6 @@ Put your unlabelled images in the **unlabelled** folder. If you dont already hav
 ```
 
 ## Todo
-- back/undo function
 - display options (resizing)
 
 ### Files
